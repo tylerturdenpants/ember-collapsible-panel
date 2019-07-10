@@ -2329,11 +2329,13 @@ ember-cli-get-component-path-option@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ember-cli-get-component-path-option/-/ember-cli-get-component-path-option-1.0.0.tgz#0d7b595559e2f9050abed804f1d8eff1b08bc771"
 
-ember-cli-github-pages@0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/ember-cli-github-pages/-/ember-cli-github-pages-0.0.6.tgz#5e627802b52b7a911ffbc0e2f0bf72bc81dd9b8e"
+ember-cli-github-pages@0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/ember-cli-github-pages/-/ember-cli-github-pages-0.2.2.tgz#cef01ed1de9ddd82863b310fef05e7f5b55beb9e"
+  integrity sha512-pFtruVBZ5OW1O1MiGQRQSQewW9DSBx6ZbRcbVpcpTlZqeDyWs5nyvhOm4qRFwK6m+jQPe2l52cYtf1rUAkBNxA==
   dependencies:
-    rsvp "^3.0.14"
+    ember-cli-version-checker "^2.1.0"
+    rsvp "^4.7.0"
 
 ember-cli-htmlbars-inline-precompile@^1.0.0, ember-cli-htmlbars-inline-precompile@^1.0.2:
   version "1.0.2"
