@@ -2393,9 +2393,10 @@ ember-cli-preprocess-registry@^3.1.0:
     process-relative-require "^1.0.0"
     silent-error "^1.0.0"
 
-ember-cli-qunit@^4.3.2:
+ember-cli-qunit@4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/ember-cli-qunit/-/ember-cli-qunit-4.3.2.tgz#cfd89ad3b0dbc28a9c2223d532b52eeade7c602c"
+  integrity sha1-z9ia07DbwoqcIiPVMrUu6t58YCw=
   dependencies:
     ember-cli-babel "^6.11.0"
     ember-qunit "^3.3.2"
@@ -2409,9 +2410,10 @@ ember-cli-sass@7.1.7:
     broccoli-sass-source-maps "^2.1.0"
     ember-cli-version-checker "^2.1.0"
 
-ember-cli-shims@^1.2.0:
+ember-cli-shims@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/ember-cli-shims/-/ember-cli-shims-1.2.0.tgz#0f53aff0aab80b5f29da3a9731bac56169dd941f"
+  integrity sha1-D1Ov8Kq4C18p2jqXMbrFYWndlB8=
   dependencies:
     broccoli-file-creator "^1.1.1"
     broccoli-merge-trees "^2.0.0"
@@ -2546,9 +2548,10 @@ ember-cli@~3.3.0:
     watch-detector "^0.1.0"
     yam "^0.0.24"
 
-ember-code-snippet@^1.1.0:
+ember-code-snippet@1.10.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/ember-code-snippet/-/ember-code-snippet-1.10.0.tgz#8bcdceb5e112af4a4b7fbe519048de1336e9749d"
+  integrity sha1-i83OteESr0pLf75RkEjeEzbpdJ0=
   dependencies:
     broccoli-browserify "^0.1.0"
     broccoli-flatiron "^0.0.0"
@@ -2565,9 +2568,10 @@ ember-copy@^1.0.0:
   dependencies:
     ember-cli-babel "^6.6.0"
 
-ember-disable-prototype-extensions@^1.1.2:
+ember-disable-prototype-extensions@1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/ember-disable-prototype-extensions/-/ember-disable-prototype-extensions-1.1.3.tgz#1969135217654b5e278f9fe2d9d4e49b5720329e"
+  integrity sha1-GWkTUhdlS14nj5/i2dTkm1cgMp4=
 
 ember-export-application-global@^2.0.0:
   version "2.0.0"
@@ -2639,7 +2643,7 @@ ember-router-generator@^1.2.3:
   dependencies:
     recast "^0.11.3"
 
-ember-source-channel-url@^1.0.1:
+ember-source-channel-url@1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/ember-source-channel-url/-/ember-source-channel-url-1.1.0.tgz#73de5cc6ebc25b2120e932ec1d8f82677bfaf6ef"
   integrity sha512-y1RVXmyqrdX6zq9ZejpPt7ohKNGuLMBEKaOUyxFWcYAM5gvLuo6xFerwNmXEBbu4e3//GaoasjodXi6Cl+ddUQ==
@@ -2682,7 +2686,7 @@ ember-try-config@^2.2.0:
     rsvp "^3.2.1"
     semver "^5.1.0"
 
-ember-try@^0.2.23:
+ember-try@0.2.23:
   version "0.2.23"
   resolved "https://registry.yarnpkg.com/ember-try/-/ember-try-0.2.23.tgz#39b57141b4907541d0ac8b503d211e6946b08718"
   integrity sha512-kmVNsSFFafGinFhERMox3SXHoU+V1td1538SbhpslPtf7S2BZYr7JdAwOCIRoRtpcWeNdYgdQGzJZxNvUc8aLg==
@@ -2805,7 +2809,7 @@ eslint-plugin-ember@^5.0.0:
     require-folder-tree "^1.4.5"
     snake-case "^2.1.0"
 
-eslint-plugin-node@^5.2.1:
+eslint-plugin-node@5.2.1:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-node/-/eslint-plugin-node-5.2.1.tgz#80df3253c4d7901045ec87fa660a284e32bdca29"
   integrity sha512-xhPXrh0Vl/b7870uEbaumb2Q+LxaEcOQ3kS1jtIXanBAwpMre1l5q/l2l/hESYJGEFKuI78bp6Uw50hlpr7B+g==
@@ -2826,7 +2830,7 @@ eslint-visitor-keys@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-1.0.0.tgz#3f3180fb2e291017716acb4c9d6d5b5c34a6a81d"
 
-eslint@^4.0.0:
+eslint@4.19.1, eslint@^4.0.0:
   version "4.19.1"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-4.19.1.tgz#32d1d653e1d90408854bfb296f076ec7e186a300"
   dependencies:
