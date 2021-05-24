@@ -1,68 +1,63 @@
-import { run } from '@ember/runloop';
-import { getOwner } from '@ember/application';
-import hbs from 'htmlbars-inline-precompile';
-import { moduleForComponent, test } from 'ember-qunit';
+import { run } from "@ember/runloop";
+import hbs from "htmlbars-inline-precompile";
+import { module, test } from "qunit";
+import { setupRenderingTest } from "ember-qunit";
+import { render, find, click } from "@ember/test-helpers";
 
-let panelActions;
+module("cp-panels", function (hooks) {
+  setupRenderingTest(hooks);
 
-moduleForComponent('cp-panels', {
-  integration: true,
-
-  setup() {
-    panelActions = getOwner(this).lookup('service:panel-actions');
-  },
-
-  teardown() {
-    panelActions.get('state').reset();
-  }
-});
-
-test('it can act as an accordion', function(assert) {
-  this.render(hbs`
-    {{#cp-panels accordion=true as |panels|}}
-      {{#panels.panel as |panel|}}
-        {{panel.toggle}}
-        {{#panel.body}}Panel A{{/panel.body}}
-      {{/panels.panel}}
-      {{#panels.panel as |panel|}}
-        {{panel.toggle}}
-        {{#panel.body}}Panel B{{/panel.body}}
-      {{/panels.panel}}
-    {{/cp-panels}}
-  `);
-
-  var $panel1 = this.$('.cp-Panel:nth-child(1)');
-  var $panel2 = this.$('.cp-Panel:nth-child(2)');
-
-  $panel1.find('.cp-Panel-toggle').click();
-  $panel2.find('.cp-Panel-toggle').click();
-
-  assert.ok(!$panel1.hasClass('cp-is-open'));
-  assert.ok($panel2.hasClass('cp-is-open'));
-});
-
-test('all panels in a group can be opened', function(assert) {
-  this.render(hbs`
-    {{#cp-panels name="a-group-of-panels" as |panels|}}
-      {{#panels.panel as |panel|}}
-        {{#panel.body}}Panel A{{/panel.body}}
-      {{/panels.panel}}
-      {{#panels.panel as |panel|}}
-        {{#panel.body}}Panel B{{/panel.body}}
-      {{/panels.panel}}
-    {{/cp-panels}}
-  `);
-
-  var $panel1 = this.$('.cp-Panel:nth-child(1)');
-  var $panel2 = this.$('.cp-Panel:nth-child(2)');
-
-  assert.ok($panel1.hasClass('cp-is-closed'));
-  assert.ok($panel2.hasClass('cp-is-closed'));
-
-  run(() => {
-    panelActions.openAll("a-group-of-panels");
+  hooks.beforeEach(function () {
+    this.panelActions = this.owner.lookup("service:panel-actions");
   });
 
-  assert.ok($panel1.hasClass('cp-is-open'));
-  assert.ok($panel2.hasClass('cp-is-open'));
+  test("it can act as an accordion", async function (assert) {
+    await render(hbs`
+      <CpPanels @accordion={{true}} as |panels|>
+        <panels.panel as |panel|>
+          {{panel.toggle}}
+          <panel.body>Panel A</panel.body>
+        </panels.panel>
+        <panels.panel as |panel|>
+          {{panel.toggle}}
+          <panel.body>Panel B</panel.body>
+        </panels.panel>
+      </CpPanels>
+    `);
+
+    let $panel1 = find(".cp-Panel:nth-child(1)");
+    let $panel2 = find(".cp-Panel:nth-child(2)");
+
+    await click($panel1.querySelector(".cp-Panel-toggle"));
+    await click($panel2.querySelector(".cp-Panel-toggle"));
+
+    assert.dom($panel1).doesNotHaveClass("cp-is-open");
+    assert.dom($panel2).hasClass("cp-is-open");
+  });
+
+  test("all panels in a group can be opened", async function (assert) {
+    await render(hbs`
+      <CpPanels @name="a-group-of-panels" as |panels|>
+        <panels.panel as |panel|>
+          <panel.body>Panel A</panel.body>
+        </panels.panel>
+        <panels.panel as |panel|>
+          <panel.body>Panel B</panel.body>
+        </panels.panel>
+      </CpPanels>
+    `);
+
+    let $panel1 = find(".cp-Panel:nth-child(1)");
+    let $panel2 = find(".cp-Panel:nth-child(2)");
+
+    assert.dom($panel1).hasClass("cp-is-closed");
+    assert.dom($panel2).hasClass("cp-is-closed");
+
+    run(() => {
+      this.panelActions.openAll("a-group-of-panels");
+    });
+
+    assert.dom($panel1).hasClass("cp-is-open");
+    assert.dom($panel2).hasClass("cp-is-open");
+  });
 });

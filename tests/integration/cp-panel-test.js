@@ -1,275 +1,255 @@
-import { run } from '@ember/runloop';
-import { getOwner } from '@ember/application';
-import hbs from 'htmlbars-inline-precompile';
-import { moduleForComponent, test } from 'ember-qunit';
-import $ from 'jquery';
+import hbs from "htmlbars-inline-precompile";
+import { module, test } from "qunit";
+import { setupRenderingTest } from "ember-qunit";
+import { render, click, find } from "@ember/test-helpers";
+import { run } from "@ember/runloop";
 
-let panelActions;
+module("cp-panel", function (hooks) {
+  setupRenderingTest(hooks);
 
-moduleForComponent('cp-panel', {
-  integration: true,
-
-  setup() {
-    panelActions = getOwner(this).lookup('service:panel-actions');
-  },
-
-  teardown() {
-    panelActions.get('state').reset();
-  }
-});
-
-test('it can toggle', function(assert) {
-  this.render(hbs`
-    {{#cp-panel as |panel|}}
-      {{panel.toggle}}
-      {{#panel.body}}Hi!{{/panel.body}}
-    {{/cp-panel}}
-  `);
-
-  var $panel = this.$('.cp-Panel');
-  $panel.find('.cp-Panel-toggle').click();
-
-  assert.ok($panel.find('.cp-Panel-body').text().match('Hi!').length);
-});
-
-test('it exposes isOpen', function(assert) {
-  this.render(hbs`
-    {{#cp-panel as |panel|}}
-      {{panel.toggle}}
-      {{#panel.body}}
-        {{#if panel.isOpen}}
-          <p>Hi!</p>
-        {{/if}}
-      {{/panel.body}}
-    {{/cp-panel}}
-  `);
-
-  var $panel = this.$('.cp-Panel');
-  $panel.find('.cp-Panel-toggle').click();
-
-  assert.ok($panel.find(':contains(Hi!)').length);
-
-  $panel.find('.cp-Panel-toggle').click();
-
-  assert.notOk($panel.find(':contains(Hi!)').length);
-});
-
-test('it can start out open', function(assert) {
-  this.render(hbs`
-    {{#cp-panel open=true as |panel|}}
-      {{#panel.body}}Hi!{{/panel.body}}
-    {{/cp-panel}}
-  `);
-
-  var $panel = this.$('.cp-Panel');
-  assert.ok($panel.find('.cp-Panel-body').text().match('Hi!').length);
-});
-
-test('it can start open and toggle closed', function(assert) {
-  this.render(hbs`
-    {{#cp-panel open=true as |panel|}}
-      {{panel.toggle}}
-      {{#panel.body}}Hi!{{/panel.body}}
-    {{/cp-panel}}
-  `);
-
-  var $panel = this.$('.cp-Panel');
-
-  // it starts out open
-  assert.ok($panel.hasClass('cp-is-open'));
-
-  // click it closed
-  $panel.find('.cp-Panel-toggle').click();
-
-  assert.ok($panel.hasClass('cp-is-closed'));
-
-});
-
-test('it will open via binding', function(assert) {
-  this.set('openBinding', false);
-
-  this.render(hbs`
-    {{#cp-panel open=openBinding as |panel|}}
-      {{#panel.body}}Hi!{{/panel.body}}
-    {{/cp-panel}}
-  `);
-
-  var $panel = this.$('.cp-Panel');
-
-  // make sure its closed
-  assert.equal($panel.find('.cp-Panel-body-inner').length, 0);
-
-  this.set('openBinding', true);
-
-  // ok now its open
-  assert.equal($panel.find('.cp-Panel-body-inner').length, 1);
-  assert.ok($panel.find('.cp-Panel-body').text().match('Hi!').length);
-});
-
-test('it will open by a service call', function(assert) {
-  this.render(hbs`
-    {{#cp-panel name="test" as |panel|}}
-      {{#panel.body}}Hi!{{/panel.body}}
-    {{/cp-panel}}
-  `);
-
-  var $panel = this.$('.cp-Panel');
-
-  // make sure its closed
-  assert.equal($panel.find('.cp-Panel-body-inner').length, 0);
-
-  run(() => {
-    panelActions.open('test');
+  hooks.beforeEach(function () {
+    this.panelActions = this.owner.lookup("service:panel-actions");
   });
 
-  // ok now its open
-  assert.equal($panel.find('.cp-Panel-body-inner').length, 1);
-  assert.ok($panel.find('.cp-Panel-body').text().match('Hi!').length);
-});
+  test("it can toggle", async function (assert) {
+    await render(hbs`
+      <CpPanel as |panel|>
+        {{panel.toggle}}
+        <panel.body>Hi!</panel.body>
+      </CpPanel>
+    `);
 
-test('it will use a binding or the service, but never overwrite the binding', function(assert) {
-  // this is kind of crazypants, but if someone sets up a panel with
-  // a binding + a service, and then uses the service to open
-  // the panel we wont overwrite the binding.
-
-  this.set('openBinding', false);
-
-  this.render(hbs`
-    {{#cp-panel open=openBinding name="test" as |panel|}}
-      {{#panel.body}}Hi!{{/panel.body}}
-    {{/cp-panel}}
-  `);
-
-  var $panel = this.$('.cp-Panel');
-  assert.ok($panel.hasClass('cp-is-closed'));
-
-  assert.equal(this.get('openBinding'), false, 'overwrote 1');
-
-  // use the service to open the panel
-  run(() => {
-    panelActions.open('test');
+    await click(".cp-Panel-toggle");
+    assert.dom(".cp-Panel-body").hasText("Hi!");
   });
 
-  // binding doesnt change
-  assert.equal(this.get('openBinding'), false, 'overwrote 2');
+  test("it exposes isOpen", async function (assert) {
+    await render(hbs`
+      <CpPanel as |panel|>
+        {{panel.toggle}}
+        <panel.body>
+          {{#if panel.isOpen}}
+            <p>Hi!</p>
+          {{/if}}
+        </panel.body>
+      </CpPanel>
+    `);
 
-  // but panel is open
-  assert.equal($panel.find('.cp-Panel-body-inner').length, 1);
-  assert.ok($panel.find('.cp-Panel-body').text().match('Hi!').length);
-});
+    await click(".cp-Panel-toggle");
+    assert.dom(".cp-Panel-body").containsText("Hi!");
 
-test('it will use a binding or a toggle, but never overwrite the binding', function(assert) {
-  this.set('openBinding', false);
-
-  this.render(hbs`
-    {{#cp-panel open=openBinding as |panel|}}
-      {{panel.toggle}}
-      {{#panel.body}}Hi!{{/panel.body}}
-    {{/cp-panel}}
-  `);
-
-  var $panel = this.$('.cp-Panel');
-  assert.ok($panel.hasClass('cp-is-closed'));
-
-  // click toggle to open the panel
-  $panel.find('.cp-Panel-toggle').click();
-
-  // binding doesnt change
-  assert.equal(this.get('openBinding'), false, 'overwrote');
-
-  // but panel is open
-  assert.equal($panel.find('.cp-Panel-body-inner').length, 1);
-  assert.ok($panel.find('.cp-Panel-body').text().match('Hi!').length);
-});
-
-test('it will have two panels with the same name used a shared state', function(assert) {
-  this.render(hbs`
-    {{#cp-panel name="test" class="panel1" as |panel|}}
-      {{#panel.body}}Hi 1!{{/panel.body}}
-    {{/cp-panel}}
-
-    {{#cp-panel name="test" class="panel2" as |panel|}}
-      {{#panel.body}}Hi 2!{{/panel.body}}
-    {{/cp-panel}}
-  `);
-
-  let $panel1 = $('.cp-Panel.panel1');
-  let $panel2 = $('.cp-Panel.panel2');
-  assert.ok($panel1.hasClass('cp-is-closed'));
-  assert.ok($panel2.hasClass('cp-is-closed'));
-
-  // use the service to open both panels
-  run(() => {
-    panelActions.open('test');
+    await click(".cp-Panel-toggle");
+    assert.dom(".cp-Panel-body").doesNotContainText("Hi!");
   });
 
-  // and both panels are now open
-  assert.equal($panel1.text().match('Hi 1!').length, 1);
-  assert.equal($panel2.text().match('Hi 2!').length, 1);
-});
+  test("it can start out open", async function (assert) {
+    await render(hbs`
+      <CpPanel @open={{true}} as |panel|>
+        <panel.body>Hi!</panel.body>
+      </CpPanel>
+    `);
 
-test('it can nest panels', function(assert) {
-  this.render(hbs`
-    {{#cp-panel class='Parent' as |panel|}}
-      {{panel.toggle}}
-      {{#panel.body}}
+    assert.dom(".cp-Panel-body").containsText("Hi!");
+  });
 
-        {{#cp-panel class='Child' as |panel|}}
-          {{panel.toggle}}
-          {{#panel.body}}
-            <p>Im a Child!</p>
-          {{/panel.body}}
-        {{/cp-panel}}
+  test("it can start open and toggle closed", async function (assert) {
+    await render(hbs`
+      <CpPanel @open={{true}} as |panel|>
+        {{panel.toggle}}
+        <panel.body>Hi!</panel.body>
+      </CpPanel>
+    `);
 
-      {{/panel.body}}
-    {{/cp-panel}}
-  `);
+    // it starts out open
+    assert.dom(".cp-Panel").hasClass("cp-is-open");
 
-  var $parent = this.$('.Parent');
+    // click it closed
+    await click(".cp-Panel-toggle");
+    assert.dom(".cp-Panel").hasClass("cp-is-closed");
+  });
 
-  // open the parent
-  $parent.find('.cp-Panel-toggle').click();
+  test("it will open via binding", async function (assert) {
+    this.set("openBinding", false);
 
-  var $child = this.$('.Child');
+    await render(hbs`
+      <CpPanel @open={{this.openBinding}} as |panel|>
+        <panel.body>Hi!</panel.body>
+      </CpPanel>
+    `);
 
-  // make sure the child isnt open
-  assert.ok($child.hasClass('cp-is-closed'));
+    // make sure its closed
+    // assert.equal($panel.find(".cp-Panel-body-inner").length, 0);
+    assert.dom(".cp-Panel-body-inner").doesNotExist();
 
-  // now open the child
-  $child.find('.cp-Panel-toggle').click();
+    this.set("openBinding", true);
 
-  // and we should see 2 panel showing (child and parent)
-  assert.ok($parent.hasClass('cp-is-open'));
-  assert.ok($child.hasClass('cp-is-open'));
+    // ok now its open
+    assert.dom(".cp-Panel-body-inner").exists();
+    assert.dom(".cp-Panel-body").hasText("Hi!");
+  });
 
-  // make sure the childs text is now showing
-  assert.equal($child.find('.cp-Panel-body').text().match(`Im a Child!`).length, 1);
-});
+  test("it will open by a service call", async function (assert) {
+    await render(hbs`
+      <CpPanel @name="test" as |panel|>
+        <panel.body>Hi!</panel.body>
+      </CpPanel>
+    `);
 
-test('it calls custom didToggle method when toggled', function(assert) {
-  this.set('handleToggle', (panelName) => assert.ok(panelName, `didToggle invoked and passed the panel name: ${panelName}`));
+    // make sure its closed
+    assert.dom(".cp-Panel-body-inner").doesNotExist();
 
-  this.render(hbs`
-    {{#cp-panel didToggle=handleToggle as |panel|}}
-      {{panel.toggle}}
-      {{#panel.body}}Hi!{{/panel.body}}
-    {{/cp-panel}}
-  `);
+    run(() => {
+      this.panelActions.open("test");
+    });
 
-  var $panel = this.$('.cp-Panel');
-  $panel.find('.cp-Panel-toggle').click();
-});
+    // ok now its open
+    assert.dom(".cp-Panel-body-inner").exists();
+    assert.dom(".cp-Panel-body").hasText("Hi!");
+  });
 
-test('it can be disabled', function(assert) {
-  this.render(hbs`
-    {{#cp-panel disabled=true as |p|}}
-      {{p.toggle}}
-      {{#p.body}}Hi!{{/p.body}}
-    {{/cp-panel}}
-  `);
+  test("it will use a binding or the service, but never overwrite the binding", async function (assert) {
+    // this is kind of crazypants, but if someone sets up a panel with
+    // a binding + a service, and then uses the service to open
+    // the panel we wont overwrite the binding.
 
-  var $panel = this.$('.cp-Panel');
-  $panel.find('.cp-Panel-toggle').click();
+    this.set("openBinding", false);
 
-  assert.ok($panel.find('.cp-Panel-body').text().match('Hi!') === null);
+    await render(hbs`
+      <CpPanel @open={{this.openBinding}} @name="test" as |panel|>
+        <panel.body>Hi!</panel.body>
+      </CpPanel>
+    `);
+
+    assert.dom(".cp-Panel").hasClass("cp-is-closed");
+    assert.equal(this.openBinding, false, "overwrote 1");
+
+    // use the service to open the panel
+    run(() => {
+      this.panelActions.open("test");
+    });
+
+    // binding doesnt change
+    assert.equal(this.openBinding, false, "overwrote 2");
+
+    // but panel is open
+    assert.dom(".cp-Panel-body-inner").exists();
+    assert.dom(".cp-Panel-body").hasText("Hi!");
+  });
+
+  test("it will use a binding or a toggle, but never overwrite the binding", async function (assert) {
+    this.set("openBinding", false);
+
+    await render(hbs`
+      <CpPanel @open={{this.openBinding}} as |panel|>
+        {{panel.toggle}}
+        <panel.body>Hi!</panel.body>
+      </CpPanel>
+    `);
+
+    assert.dom(".cp-Panel").hasClass("cp-is-closed");
+
+    // click toggle to open the panel
+    await click(".cp-Panel-toggle");
+
+    // binding doesnt change
+    assert.equal(this.openBinding, false, "overwrote");
+
+    // but panel is open
+    assert.dom(".cp-Panel-body-inner").exists();
+    assert.dom(".cp-Panel-body").hasText("Hi!");
+  });
+
+  test("it will have two panels with the same name used a shared state", async function (assert) {
+    await render(hbs`
+      <CpPanel @name="test" @class="panel1" as |panel|>
+        <panel.body>Hi 1!</panel.body>
+      </CpPanel>
+
+      <CpPanel @name="test" @class="panel2" as |panel|>
+        <panel.body>Hi 2!</panel.body>
+      </CpPanel>
+    `);
+
+    assert.dom(".cp-Panel.panel1").hasClass("cp-is-closed");
+    assert.dom(".cp-Panel.panel2").hasClass("cp-is-closed");
+
+    // use the service to open both panels
+
+    run(() => {
+      this.panelActions.open("test");
+    });
+
+    // and both panels are now open
+    assert.dom(".cp-Panel.panel1").hasText("Hi 1!");
+    assert.dom(".cp-Panel.panel2").hasText("Hi 2!");
+  });
+
+  test("it can nest panels", async function (assert) {
+    await render(hbs`
+      <CpPanel @class="Parent" as |panel|>
+        {{panel.toggle}}
+        <panel.body>
+
+          <CpPanel @class="Child" as |panel|>
+            {{panel.toggle}}
+            <panel.body>
+              <p>Im a Child!</p>
+            </panel.body>
+          </CpPanel>
+
+        </panel.body>
+      </CpPanel>
+    `);
+
+    let $parent = find(".Parent");
+
+    // open the parent
+    await click($parent.querySelector(".cp-Panel-toggle"));
+
+    let $child = find(".Child");
+
+    // make sure the child isnt open
+    assert.dom($child).hasClass("cp-is-closed");
+
+    // now open the child
+    await click($child.querySelector(".cp-Panel-toggle"));
+
+    // and we should see 2 panel showing (child and parent)
+    assert.dom($parent).hasClass("cp-is-open");
+    assert.dom($child).hasClass("cp-is-open");
+
+    assert
+      .dom($child.querySelector(".cp-Panel-body"))
+      .containsText(`Im a Child!`);
+  });
+
+  test("it calls custom didToggle method when toggled", async function (assert) {
+    this.set("handleToggle", (panelName) =>
+      assert.ok(
+        panelName,
+        `didToggle invoked and passed the panel name: ${panelName}`
+      )
+    );
+
+    await render(hbs`
+      <CpPanel @didToggle={{this.handleToggle}} as |panel|>
+        {{panel.toggle}}
+        <panel.body>Hi!</panel.body>
+      </CpPanel>
+    `);
+
+    await click(".cp-Panel-toggle");
+  });
+
+  test("it can be disabled", async function (assert) {
+    await render(hbs`
+      <CpPanel @disabled={{true}} as |p|>
+        {{p.toggle}}
+        <p.body>Hi!</p.body>
+      </CpPanel>
+    `);
+
+    await click(".cp-Panel-toggle");
+    assert.dom(".cp-Panel-body").doesNotContainText("Hi!");
+  });
 });
